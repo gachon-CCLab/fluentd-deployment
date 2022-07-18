@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluentd
+spec:
+  selector:
+    matchLabels:
+      app: fluentd
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      volumes:
+        - name: shared-train-data # 학습데이터 저장용
+          emptyDir: {}
+        - name: shared-model # 모델 저장용
+          emptyDir: {}
+      containers:
+          - name: fluentd
+            image: docker.io/hoo0681/airflowkubepodimage:0.1
+            resources:
+              limits:
+                memory: "2Gi"
+                cpu: "500m"
+            ports:
+              - containerPort: 8011
+            env:
+            - name: REPO_URL
+              value: "https://github.com/gachon-CCLab/fluentd.git"
+            - name: GIT_TAG
+              value: "master"
+            - name: GRPC_POLL_STRATEGY
+              value: "epoll1"
